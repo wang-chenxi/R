@@ -1,0 +1,82 @@
+---
+title: "HW2"
+author: "Chenxi Wang"
+date: "4/27/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Q1 – Read in the ities.csv datafile as a dataframe object, df. 
+
+```{r}
+df <- read.csv('ities.csv')    # Reading in the ities.csv data file
+```
+No descriptive answer is needed.
+
+
+## Q2 – Display the number of rows and columns in the dataset using an appropriate R function. Below the output, identify which numbers from the output correspond to the number of rows and columns. 
+
+```{r}
+dim(df)     # display the num of rows and the num of columns 
+nrow(df)    # display the number of rows
+ncol(df)    #display the number of columns
+```
+In the dim function, there will be output of two numbers, the first number is num of rows, the second number is num of columns
+
+1. The nrow function display the number of rows
+2. The ncol function display the number of columns
+3. This dataframe has 438151 rows and 13 columns.
+
+## Q3 – Display the structure of the dataframe, df. Below the output, briefly summarize one or two main points about the dataframe structure.
+
+```{r}
+str(df) #display the structure of the dataframe df
+```
+Main point:
+
+1. The data type of df includes chr, num, and int.
+2. There are 13 variables(features) within the dataframe. 
+
+
+## Q4 – What is the unit of observation in the dataset? 
+Display at least one calculation in the code chunk below. Below the calculation(s), briefly explain how the output of your calculation(s) supports your conclusion.
+
+```{r results="hide"}
+
+unique(df[c('Date','StoreNumber','LineItem','TransactionNumber','Quantity','Price')]) # display unit of observation by combination of features.Hide the result since it is too large  
+```
+
+For unique observation, it should distinct values with less columns as possible, and provide business insights. In my approach, we would like to understand the sales of items. Thus, on which date, in which store, for which transaction, what item has been sold with what quantity.
+There might be duplicated data within the dataframe, so the unique values are less than the number of total rows.
+
+## Q5 – If we were to consider each transaction as the unit of observation, comment on whether the provided data is in a tidy format. (No code is needed)
+
+No, the provided data is not in a tidy format if we consider each transaction as the unit.
+According to our df, the length(unique(df$TranscationNumber)) will give us the total number of transacations, which is 161058. However, there are more than 400k rows in the dataframe. According to the requirements of tidy data, every row should be an observation. So the current dataframe doesn't meet the requirement if we consider unique transaction as the unit.
+
+
+## Q6 – Display the summaries of the Price, Quantity and TotalDue columns. Below the output, provide a brief interpretation of the output.
+
+```{r}
+summary(df[c('Price', 'Quantity','TotalDue')]) #display summary of price, quantity and total column summary
+
+```
+
+Brief summary:
+
+1. It provides distribution information and central tendency. 
+2. The distribution and variation of quantity is very small.  
+3. Also, it tells the NA columns in the data. There's no NA data in quantity, and 12 NA for price and total due seperately. 
+
+## Q7 – Display the bxplots of the log values for the Price, Quantity and Total Due columns. Below the output, provide a brief interpretation of the output.   
+
+```{r}
+boxplot(log10(df[c('Price','Quantity','TotalDue')]))  #display the boxplots of the log 10 values for the Price, Quantity and Total due columns
+
+```
+
+Brief interpretation:
+The boxplots of price and total due are similar, thus they have strong correlation with each other.
+
+
