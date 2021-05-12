@@ -1,0 +1,87 @@
+---
+title: "HW3"
+author: "Chenxi Wang"
+date: "5/4/2021"
+output: html_document
+---
+
+
+## Q1 Read the datafile as dataframe, df and create a new RMD file to answer the following questions.
+
+```{r}
+
+df <- read.csv('ities.csv')
+
+```
+
+
+## Q2 Display the number of rows and columns in the dataset using an appropriate R function. Below the output, identify which numbers from the output correspond to the number of rows and columns.
+
+```{r}
+
+dim(df) #display the number of rows and the number of columns 
+
+```
+In the dim function, there will be output of two numbers, the first number is num of rows, the second number is num of columns. Thus, this dataframe has 438151 rows and 13 columns.
+
+
+## Q3 Display the structure of the dataframe, df. Below the output, briefly summarize two main points about the dataframe structure.
+
+```{r}
+
+str(df) #display the structure of the dataframe df
+
+```
+
+Main points:
+
+1. The data type of df includes chr, num, and int. Especially, the data type of date column is character. 
+2. There are 13 variables(features) within the dataframe. 
+
+
+## Q4 Display a summary of the columns in df. Below the output, comment on columns for which the data type does not seem correct, the format to which they should be changed, and why that change would be helpful.
+
+```{r}
+
+summary(df) #display the summary of the columns in dataframe df
+
+```
+As mentioned in Question 3, the data type of Date column is character. However, it should be with date type, which will be easier for further data analytics and relevant calculation.
+
+## Q5  Convert the values in Department and LineItem columns to lower cases and save them as Department_lower and LineItem_lower. 
+
+```{r}
+
+library(stringr) #explicitly load the library 'stringr'
+Department_lower <- str_to_lower(df$Department) #convert Deparment column to lower cases and save as Department_lower 
+LineItem_Lower <-str_to_lower(df$LineItem) #convert LineItem column to lower cases and save as LineItem_lower 
+
+```
+
+## Q6 Use the plot function on Department_lower. You will get an error. Below the output, describe the reason for the error. After running the code chunk to see the error, comment out the code chunk so that you can knit the document to a .html file.
+
+```{r}
+
+#plot(Department_lower)  
+
+```
+Since the datatype of Department_lower is character. String doesn't know what to plot and report an error. If we want to plot, we should convert it to factor.
+
+
+## Q7 Convert the datatype of Department_lower to a factor type (do not create new column, just convert it in place). 
+
+```{r}
+
+Department_lower <- factor(Department_lower) #convert datatype of Department_lower to a factor type 
+
+```
+
+## Q8 Use the plot function on the Department_lower column to display a plot of that column from most frequent on the left to least frequent on the right. Below the output, comment on the department that occurs most frequently, as well as the one that occurs least frequently. It may be hard for you to read the names of all of the departments from the plot. You may have to add additional code to adjust the plot or to print out additional summary information so that you can identify the departments that appear most/least frequently. Make sure that your comments are supported by the code that is displayed. (You can get more information about plot function by searching it in help section on the right of the RStudio.)
+
+```{r}
+library(forcats) #explicitly load the library 'forcats'
+plot(fct_infreq(Department_lower)) #plot Department_lower column from most frequent on the left to least frequent on the right
+summary(fct_infreq(Department_lower)) #summarize Department_lower column from most frequent on the left to least frequent on the right
+```
+The department that occurs most frequently is entrees with 152575.
+The department that occurs least frequntly is swag with 356.

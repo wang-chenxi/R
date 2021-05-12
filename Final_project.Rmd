@@ -1,0 +1,144 @@
+---
+title: "Final Project"
+author: "Chenxi Wang"
+date: "5/11/2021"
+output: html_document
+---
+
+## 1. Read in the ities.csv and max_temp.csv as dataframe objects df and df_weather_weekly, respectively.
+
+```{r}
+
+library(tidyverse) # For lots of data wrangling tasks
+library(magrittr) # For piping data into functions
+library(lubridate) # For dealing with dates
+
+df <- read.csv('ities.csv') # Read data from ities.csv as df
+df_weather_weekly <- read.csv('max_temp.csv') # Read data from max_temp.csv as df_weather_weekly
+
+```
+
+## 2. Display the number of rows and columns in df and df_weather_weekly, respectively, using an appropriate R function. 
+
+```{r}
+
+dim(df) # Display the number of rows and columns in df
+dim(df_weather_weekly) # Display the number of rows and columns in df_weather_weekly
+
+```
+1. There are 438151 rows and 13 columns in df
+2. There are 52 rows and 9 columns in df_weather_weekly
+
+## 3. Display the structures of the dataframes, df and df_weather_weekly. Below the output, comment on the appropriateness of the datatypes for the columns.
+
+```{r}
+
+str(df) # Display the structures of df
+str(df_weather_weekly) # Display the structures of df_weather_weekly
+
+```
+The datatype of Date column in df is chr, which should be date type for better analytics. 
+
+## 4. Display summaries of the columns in the dataframes, df and df_weather_weekly. 
+
+
+```{r}
+
+summary(df) # Display summaries of the columns in df
+summary(df_weather_weekly) # Display summaries of the columns in df_weather_weekly
+
+```
+
+
+## 5. Display the missing values, if any, in df. You can choose to remove or input the missing values and defend that choice in 1-2 sentences for each column with missing values.
+
+```{r}
+
+colSums(is.na(df)) ## See the numbers of missing values in columns of df
+
+```
+Running above code block, we can see that there are missing values in two columns - Price and TotalDue.
+
+```{r}
+
+df <- df%>% filter(!is.na(Price)) # Remove the missing values in Price column
+df <- df%>% filter(!is.na(TotalDue)) # Remove the missing values in TotalDue column
+colSums(is.na(df)) ## Double check if there's any missing value in the updated df
+
+```
+I choose to remove the rows with missing values in the Price column and TotalDue column. Since there were 438151 rows in df, and the rows with missing values were few, thus, remove the rows won't affect the data analytics. 
+
+Then, double check if there's still any missing value in df.
+
+## 6. Create a new dataset df_daily by aggregating the dataframe df at the daily level. The dataframe df_daily must have the columns Quantity and TotalDue from df summarized at the daily level. In one to two sentences, defend the choice of the summary measure (sum, mean, or other) used to aggregate the values  in  each column.
+
+
+```{r}
+
+df_daily <- df %>%
+  group_by(Date)%>% # Group by date
+  summarize(Quantity = sum(Quantity), # Sum the quantity in the same date
+            TotalDue = sum(TotalDue)) %>% # Sum the TotalDue in the same date
+  ungroup() #Ungroup for further data analytics
+
+```
+
+Since it required me to aggregate df at the daily level, so I use sum to aggregate Quanity and TotalDue for Date's group. 
+
+## 7. Convert the dataframe df_weather_weekly from wide to long such that names of the seven columns (Monday:Sunday) are in a new column day and the values from those seven columns (Monday:Sunday) are in a new column max_temp. The name of the long dataframe will be df_weather_daily. 
+
+
+```{r}
+
+df_weather_daily <- df_weather_weekly %>%
+  pivot_longer(col = Monday:Sunday, # Target the Monday to Sunday columns
+    names_to = 'day', # Put the columns in a new column day
+    values_to = 'max_temp' # Put the values from the columns in a new column max_temp
+  )
+
+```
+
+Created the df_weather_daily with above requirements.
+
+## 8. Merge/join the dataframes df_daily and df_weather_daily into one dataframe df_final such that only the rows that are in both df_daily and df_weather_daily are in df_final. 
+
+
+```{r}
+
+df_weather_daily_new <- df_weather_daily %>% 
+  mutate(
+  Date = mdy(WeekStarting) + case_when( #Use case_when to convert the Monday ~ Sunday into number value and create a new Date column in a new data frame df_weather_daily_new 
+    day =='Monday' ~ 0 
+    , day == 'Tuesday' ~ 1
+    , day == 'Wednesday' ~ 2
+    , day == 'Thursday' ~ 3
+    , day == 'Friday' ~ 4
+    , day == 'Saturday' ~ 5
+    , day == 'Sunday' ~ 6
+  )
+)
+
+df_daily_new<- df_daily %>%
+  mutate(
+    Date = mdy(Date) # Convert the data type of Date from chr to Date in a new data frame df_daily_new
+  )
+
+df_final <- df_daily_new %>%
+  inner_join(df_weather_daily_new, by = 'Date') # Create df_final by the inner_join on primary key Date
+
+```
+
+Since the requirement mentioned that marge/join with only rows that in both data frame, so it should be inner_join.
+
+To process the join, we need to match the key in the two df. Firstly, convert the day column into a new column Date with date type by using case_when and mdy. Second, convert the Date column into date type by using mdy. Finally, inner join the two data frame by matching the value in Date column.
+
+## 9. Display a pairplot like the one demonstrated in the "Getting to Know Your Data 3: Summary Statistics for Each Column, and Quick Plots" video the of module 2 (e.g., plot(iris[,c('Sepal.Length', 'Sepal.Wdith', 'Petal.Length')])). Create this pairplot for three columns from df_final: Quantity, TotalDue, and max_temp. Below the output, interpret the scatter plots that are in the pairpot.
+
+
+```{r}
+
+plot(df_final[,c('Quantity', 'TotalDue', 'max_temp')]) #Display the pairplot
+
+```
+
+In the pairplot, it can tell that the Quantity and TotalDue are positively correlated with each other. The max_temp is not with strong correlation with Quantity and TotalDue. 
